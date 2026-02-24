@@ -1,0 +1,43 @@
+name: MEAN App CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.avinash9348 }}
+          password: ${{ secrets.Avinash@123 }}
+
+      - name: Build Backend Image
+        run: docker build -t ${{ secrets.avinash9348 }}/mean-backend:latest ./backend
+
+      - name: Build Frontend Image
+        run: docker build -t ${{ secrets.avinash9348 }}/mean-frontend:latest ./frontend
+
+      - name: Push Backend Image
+        run: docker push ${{ secrets.avinash9348 }}/mean-backend:latest
+
+      - name: Push Frontend Image
+        run: docker push ${{ secrets.avinash9348 }}/mean-frontend:latest
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.public_ip }}
+          username: ${{ secrets.ubuntu }}
+          key: ${{ secrets.key01 }}
+          script: |
+            cd mean-devops-cicd
+            docker compose pull
+            docker compose up -d
